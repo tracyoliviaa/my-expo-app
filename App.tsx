@@ -1,15 +1,23 @@
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
-import { createDrawerNavigator, DrawerContentComponentProps } from '@react-navigation/drawer';
+import { createDrawerNavigator } from '@react-navigation/drawer';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import Dashboard from './screens/Dashboard';
-import Header from './components/Header';
 import CustomDrawerContent from './components/CustomerDrawerContent';
+import Header from './components/Header';
 
+// Import screens
+import Dashboard from './screens/Dashboard';
+import Device from './screens/Device';
+import Doctor from './screens/Doctor';
+import Patient from './screens/Patient';
+import DoctorSchedule from './screens/DoctorSchedule';
+import PatientAppointment from './screens/PatientAppointment';
+import PatientCaseStudies from './screens/PatientCaseStudies';
+import Prescription from './screens/Prescription';
+import LoginPage from './screens/LoginPage';
 
-
-// Define the root parameter list type
-type RootDrawerParamList = {
+// Define the type for drawer navigation parameters
+export type RootDrawerParamList = {
   Dashboard: undefined;
   Device: undefined;
   Doctor: undefined;
@@ -21,23 +29,33 @@ type RootDrawerParamList = {
   'Login Page': undefined;
 };
 
+// Create drawer navigator with type
 const Drawer = createDrawerNavigator<RootDrawerParamList>();
 
-export default function App() {
+export default function App(): JSX.Element {
   return (
     <SafeAreaProvider>
       <NavigationContainer>
         <Drawer.Navigator
           initialRouteName="Dashboard"
-          drawerContent={(props: DrawerContentComponentProps) => (
-            <CustomDrawerContent {...props} />
-          )}
+          drawerContent={(props) => <CustomDrawerContent {...props} />}
           screenOptions={{
-            header: (props) => <Header />
+            header: () => <Header />,
+            drawerStyle: {
+              width: 280,
+            },
+            drawerType: 'slide',
           }}
         >
           <Drawer.Screen name="Dashboard" component={Dashboard} />
-          {/* Add other screens here */}
+          <Drawer.Screen name="Device" component={Device} />
+          <Drawer.Screen name="Doctor" component={Doctor} />
+          <Drawer.Screen name="Patient" component={Patient} />
+          <Drawer.Screen name="Doctor Schedule" component={DoctorSchedule} />
+          <Drawer.Screen name="Patient Appointment" component={PatientAppointment} />
+          <Drawer.Screen name="Patient Case Studies" component={PatientCaseStudies} />
+          <Drawer.Screen name="Prescription" component={Prescription} />
+          <Drawer.Screen name="Login Page" component={LoginPage} />
         </Drawer.Navigator>
       </NavigationContainer>
     </SafeAreaProvider>
