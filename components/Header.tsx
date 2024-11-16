@@ -31,7 +31,7 @@ export default function Header() {
         </TouchableOpacity>
         <View style={styles.logoContainer}>
           <Image 
-            source={require('../assets/logo.png')} // Make sure to add your logo file
+            source={require('../assets/logo.png')} 
             style={styles.logo}
           />
           <Text style={styles.headerTitle}>HealthEase</Text>
@@ -61,7 +61,7 @@ export default function Header() {
 
         <TouchableOpacity style={styles.languageButton}>
           <Image 
-            source={require('../assets/en-flag.png')} // Add your flag image
+            source={require('../assets/en-flag.png')} 
             style={styles.flagIcon}
           />
           <Text style={styles.buttonText}>EN</Text>
@@ -131,5 +131,6 @@ const styles = StyleSheet.create({
     borderRadius: 2,
   },
 });
+
 
 

@@ -1,27 +1,28 @@
+// components/CustomerDrawerContent.tsx
 import { Ionicons } from '@expo/vector-icons';
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, Animated, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, Animated, TouchableOpacity, Image } from 'react-native';
 import { DrawerContentScrollView, DrawerItem } from '@react-navigation/drawer';
 import { DrawerContentComponentProps } from '@react-navigation/drawer';
-import { RootDrawerParamList } from '../App';
 
-// Define types for menu items
-type MenuItem = {
-  name: keyof typeof Ionicons.glyphMap;
-};
+interface MenuItem {
+  name: string;
+  icon: keyof typeof Ionicons.glyphMap;
+  route: string;
+}
 
-// Define menu items
 const menuItems: MenuItem[] = [
-  { name: 'home-outline' },
-  { name: 'hardware-chip-outline' },
-  { name: 'medical-outline' },
-  { name: 'person-outline' },
-  { name: 'calendar-outline' },
-  { name: 'document-text-outline' },
-  { name: 'log-in-outline' }, // Changed from 'pill-outline'
+  { name: 'Dashboard', icon: 'home-outline', route: 'Dashboard' },
+  { name: 'Device', icon: 'hardware-chip-outline', route: 'Device' },
+  { name: 'Doctor', icon: 'medical-outline', route: 'Doctor' },
+  { name: 'Patient', icon: 'people-outline', route: 'Patient' },
+  { name: 'Doctor Schedule', icon: 'calendar-outline', route: 'Doctor Schedule' },
+  { name: 'Patient Appointment', icon: 'calendar-number-outline', route: 'Patient Appointment' },
+  { name: 'Patient Case Studies', icon: 'document-text-outline', route: 'Patient Case Studies' },
+  { name: 'Prescription', icon: 'medical-outline', route: 'Prescription' },
 ];
 
-export default function CustomDrawerContent(props: DrawerContentComponentProps) {
+export default function CustomerDrawerContent(props: DrawerContentComponentProps) {
   const [isExpanded, setIsExpanded] = useState(true);
   const drawerWidth = new Animated.Value(280);
 
@@ -37,48 +38,74 @@ export default function CustomDrawerContent(props: DrawerContentComponentProps) 
 
   return (
     <Animated.View style={[styles.container, { width: drawerWidth }]}>
-      <DrawerContentScrollView {...props} style={styles.drawerContent}>
-        {/* ... (rest of the code remains unchanged) ... */}
+      <View style={styles.drawerHeader}>
+        <View style={styles.logoContainer}>
+          <Image
+            source={require('../assets/logo.png')}
+            style={{ width: 32, height: 32 }}
+          />
+          {isExpanded && (
+            <Text style={styles.logoText}>HealthEase</Text>
+          )}
+        </View>
+        <TouchableOpacity onPress={toggleDrawer} style={styles.toggleButton}>
+          <Ionicons
+            name={isExpanded ? 'chevron-back-outline' : 'chevron-forward-outline'}
+            size={24}
+            color="#fff"
+          />
+        </TouchableOpacity>
+      </View>
 
+      <View style={styles.profileSection}>
+        <Image
+          source={require('../assets/profile.png')}
+          style={styles.profileImage}
+        />
+        {isExpanded && (
+          <View>
+            <Text style={styles.profileName}>Super Admin</Text>
+            <Text style={styles.profileRole}>Administrator</Text>
+          </View>
+        )}
+      </View>
+
+      <DrawerContentScrollView {...props} style={styles.drawerContent}>
         <View style={styles.menuContainer}>
           {menuItems.map((item) => (
             <DrawerItem
-              key={item.name}
+              key={item.route}
               label={() => (
                 isExpanded ? <Text style={styles.menuText}>{item.name}</Text> : null
               )}
               icon={({ size }) => (
-                <Ionicons name={item.name} size={size} color="#fff" />
+                <Ionicons name={item.icon} size={size} color="#fff" />
               )}
-              onPress={() => props.navigation.navigate(item.name)}
+              onPress={() => props.navigation.navigate(item.route)}
               style={styles.menuItem}
             />
           ))}
-
-          <DrawerItem
-            label={() => (
-              isExpanded ? <Text style={styles.menuText}>Log Out</Text> : null
-            )}
-            icon={({ size }) => (
-              <Ionicons name="log-out-outline" size={size} color="#fff" />
-            )}
-            onPress={() => {
-              // Handle logout logic here
-              props.navigation.navigate('Login Page');
-            }}
-            style={[styles.menuItem, styles.logoutButton]}
-          />
         </View>
       </DrawerContentScrollView>
+
+      <DrawerItem
+        label={() => (
+          isExpanded ? <Text style={styles.menuText}>Logout</Text> : null
+        )}
+        icon={({ size }) => (
+          <Ionicons name="log-out-outline" size={size} color="#fff" />
+        )}
+        onPress={() => props.navigation.navigate('Login Page')}
+        style={[styles.menuItem, styles.logoutButton]}
+      />
     </Animated.View>
   );
 }
 
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#2c3e50',
+    backgroundColor: '#00695c',
   },
   drawerContent: {
     flex: 1,
@@ -89,7 +116,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     padding: 16,
     borderBottomWidth: 1,
-    borderBottomColor: '#34495e',
+    borderBottomColor: '#004d40',
   },
   logoContainer: {
     flexDirection: 'row',
@@ -104,9 +131,31 @@ const styles = StyleSheet.create({
   toggleButton: {
     padding: 4,
   },
+  profileSection: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#004d40',
+  },
+  profileImage: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    marginRight: 12,
+  },
+  profileName: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  profileRole: {
+    color: '#80cbc4',
+    fontSize: 14,
+  },
   menuContainer: {
     flex: 1,
-    paddingTop: 16,
+    paddingTop: 8,
   },
   menuItem: {
     marginHorizontal: 0,
@@ -117,7 +166,8 @@ const styles = StyleSheet.create({
   },
   logoutButton: {
     borderTopWidth: 1,
-    borderTopColor: '#34495e',
+    borderTopColor: '#004d40',
+    marginTop: 'auto',
     marginHorizontal: 0,
   },
 });

@@ -1,11 +1,12 @@
+// App.tsx
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import CustomDrawerContent from './components/CustomerDrawerContent';
+import CustomerDrawerContent from './components/CustomerDrawerContent';
 import Header from './components/Header';
 
-// Import screens
+// Import all screens
 import Dashboard from './screens/Dashboard';
 import Device from './screens/Device';
 import Doctor from './screens/Doctor';
@@ -29,16 +30,15 @@ export type RootDrawerParamList = {
   'Login Page': undefined;
 };
 
-// Create drawer navigator with type
 const Drawer = createDrawerNavigator<RootDrawerParamList>();
 
-export default function App(): JSX.Element {
+export default function App() {
   return (
     <SafeAreaProvider>
       <NavigationContainer>
         <Drawer.Navigator
           initialRouteName="Dashboard"
-          drawerContent={(props) => <CustomDrawerContent {...props} />}
+          drawerContent={(props) => <CustomerDrawerContent {...props} />}
           screenOptions={{
             header: () => <Header />,
             drawerStyle: {
