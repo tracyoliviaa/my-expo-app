@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Image } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation, DrawerActions } from '@react-navigation/native';
 import { DrawerNavigationProp } from '@react-navigation/drawer';
@@ -26,46 +26,28 @@ export default function Header() {
   return (
     <View style={styles.header}>
       <View style={styles.leftSection}>
-        <TouchableOpacity onPress={() => navigation.toggleDrawer()} style={styles.menuButton}>
-          <Ionicons name="menu-outline" size={24} color="#333" />
+        <TouchableOpacity onPress={() => navigation.dispatch(DrawerActions.toggleDrawer())} style={styles.menuButton}>
+          <Ionicons name="menu" size={24} color="black" />
         </TouchableOpacity>
-        <View style={styles.logoContainer}>
-          <Image 
-            source={require('../assets/logo.png')} 
-            style={styles.logo}
-          />
-          <Text style={styles.headerTitle}>HealthEase</Text>
-        </View>
-      </View>
-
-      <View style={styles.rightSection}>
         <TouchableOpacity style={styles.headerButton}>
-          <Ionicons name="globe-outline" size={20} color="#333" />
           <Text style={styles.buttonText}>Go To Website</Text>
         </TouchableOpacity>
-
+      </View>
+      <View style={styles.rightSection}>
         <TouchableOpacity style={styles.headerButton}>
-          <Ionicons name="chatbubbles-outline" size={20} color="#333" />
           <Text style={styles.buttonText}>Chat With Us</Text>
         </TouchableOpacity>
-
         <TouchableOpacity style={styles.headerButton}>
-          <Ionicons name="medical-outline" size={20} color="#333" />
           <Text style={styles.buttonText}>HealthEase</Text>
+          <Ionicons name="chevron-down" size={16} color="black" />
         </TouchableOpacity>
-
         <TouchableOpacity style={styles.headerButton}>
-          <Ionicons name="person-outline" size={20} color="#333" />
           <Text style={styles.buttonText}>Mr Patient</Text>
+          <Ionicons name="chevron-down" size={16} color="black" />
         </TouchableOpacity>
-
         <TouchableOpacity style={styles.languageButton}>
-          <Image 
-            source={require('../assets/en-flag.png')} 
-            style={styles.flagIcon}
-          />
           <Text style={styles.buttonText}>EN</Text>
-          <Ionicons name="chevron-down-outline" size={16} color="#333" />
+          <Ionicons name="chevron-down" size={16} color="black" />
         </TouchableOpacity>
       </View>
     </View>
@@ -90,20 +72,6 @@ const styles = StyleSheet.create({
     marginRight: 16,
     padding: 4,
   },
-  logoContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  logo: {
-    width: 32,
-    height: 32,
-    marginRight: 8,
-  },
-  headerTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#333',
-  },
   rightSection: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -125,12 +93,4 @@ const styles = StyleSheet.create({
     gap: 4,
     padding: 6,
   },
-  flagIcon: {
-    width: 20,
-    height: 15,
-    borderRadius: 2,
-  },
 });
-
-
-
