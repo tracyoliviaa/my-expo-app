@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, Pressable } from 'react-native';
+import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation, DrawerActions } from '@react-navigation/native';
 import { DrawerNavigationProp } from '@react-navigation/drawer';
@@ -16,150 +16,124 @@ type RootDrawerParamList = {
   'Login Page': undefined;
 };
 
+type ButtonProps = {
+  icon?: keyof typeof Ionicons.glyphMap;
+  text: string;
+  variant?: 'primary' | 'secondary';
+  onPress?: () => void;
+  showDropdown?: boolean;
+};
+
 const Header = () => {
   const navigation = useNavigation<DrawerNavigationProp<RootDrawerParamList>>();
   const [hoveredButton, setHoveredButton] = useState<string | null>(null);
 
-  // Custom button component with hover effect
-  const CustomButton = ({
-    icon,
-    text,
-    style,
-    variant = 'default',
+  const HeaderButton: React.FC<ButtonProps> = ({ 
+    icon, 
+    text, 
+    variant = 'secondary',
     onPress,
-    identifier,
-  }: {
-    icon: string;
-    text?: string;
-    style?: any;
-    variant?: 'primary' | 'secondary' | 'default';
-    onPress?: () => void;
-    identifier: string;
+    showDropdown = false
   }) => {
-    const getColors = () => {
-      switch (variant) {
-        case 'primary':
-          return {
-            default: { bg: '#00695C', text: '#ffffff', icon: '#ffffff' },
-            pressed: { bg: '#004D40', text: '#ffffff', icon: '#ffffff' },
-            hovered: { bg: '#004D40', text: '#ffffff', icon: '#ffffff' },
-          };
-        case 'secondary':
-          return {
-            default: { bg: '#E0F2F1', text: '#00695C', icon: '#00695C' },
-            pressed: { bg: '#B2DFDB', text: '#00695C', icon: '#00695C' },
-            hovered: { bg: '#B2DFDB', text: '#00695C', icon: '#00695C' },
-          };
-        default:
-          return {
-            default: { bg: '#E0F2F1', text: '#00695C', icon: '#00695C' },
-            pressed: { bg: '#B2DFDB', text: '#00695C', icon: '#00695C' },
-            hovered: { bg: '#B2DFDB', text: '#00695C', icon: '#00695C' },
-          };
-      }
-    };
-
-    const colors = getColors();
-    const isHovered = hoveredButton === identifier;
+    const buttonId = `${text}-${variant}`;
+    const isHovered = hoveredButton === buttonId;
 
     return (
       <Pressable
         onPress={onPress}
-        onHoverIn={() => setHoveredButton(identifier)}
+        onHoverIn={() => setHoveredButton(buttonId)}
         onHoverOut={() => setHoveredButton(null)}
         style={({ pressed }) => [
           styles.button,
-          style,
-          { backgroundColor: isHovered ? colors.hovered.bg : colors.default.bg },
-          pressed && { backgroundColor: colors.pressed.bg, transform: [{ scale: 0.98 }] },
+          variant === 'primary' ? styles.primaryButton : styles.secondaryButton,
+          isHovered && (variant === 'primary' ? styles.primaryButtonHovered : styles.secondaryButtonHovered),
+          pressed && styles.buttonPressed,
         ]}
       >
-        <Ionicons
-          name={icon as any}
-          size={20}
-          color={isHovered ? colors.hovered.icon : colors.default.icon}
-        />
-        {text && (
-          <Text
-            style={[
-              styles.buttonText,
-              { color: isHovered ? colors.hovered.text : colors.default.text },
-            ]}
-          >
-            {text}
-          </Text>
+        {icon && (
+          <Ionicons
+            name={icon}
+            size={20}
+            color={variant === 'primary' ? '#FFFFFF' : '#00695C'}
+            style={styles.buttonIcon}
+          />
         )}
-        {identifier.includes('dropdown') && (
+        <Text
+          style={[
+            styles.buttonText,
+            variant === 'primary' ? styles.primaryButtonText : styles.secondaryButtonText,
+          ]}
+        >
+          {text}
+        </Text>
+        {showDropdown && (
           <Ionicons
             name="chevron-down"
             size={16}
-            color={isHovered ? colors.hovered.icon : colors.default.icon}
+            color={variant === 'primary' ? '#FFFFFF' : '#00695C'}
+            style={styles.dropdownIcon}
           />
         )}
       </Pressable>
     );
   };
 
+  const MenuButton = () => (
+    <Pressable
+      onPress={() => navigation.dispatch(DrawerActions.toggleDrawer())}
+      style={({ pressed }) => [
+        styles.menuButton,
+        pressed && styles.buttonPressed,
+      ]}
+    >
+      <Ionicons name="menu" size={24} color="#FFFFFF" />
+    </Pressable>
+  );
+
   return (
     <View style={styles.headerContainer}>
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.headerScroll}>
-        <View style={styles.header}>
-          <View style={styles.leftSection}>
-            <CustomButton
-              icon="menu-outline"
-              variant="primary"
-              identifier="menu"
-              onPress={() => navigation.dispatch(DrawerActions.toggleDrawer())}
-              style={styles.menuButton}
-            />
-            
-            <CustomButton
-              icon="globe-outline"
-              text="Go To Website"
-              variant="primary"
-              identifier="website"
-              style={styles.websiteButton}
-            />
-          </View>
-
-          <View style={styles.rightSection}>
-            <CustomButton
-              icon="chatbubble-outline"
-              text="Chat With Us"
-              identifier="chat"
-              style={styles.actionButton}
-            />
-
-            <CustomButton
-              icon="business-outline"
-              text="HealthEase"
-              identifier="business-dropdown"
-              style={styles.dropdownButton}
-            />
-
-            <CustomButton
-              icon="person-circle-outline"
-              text="Mr Patient"
-              identifier="user-dropdown"
-              style={styles.dropdownButton}
-            />
-
-            <CustomButton
-              icon="flag-outline"
-              text="EN"
-              identifier="language-dropdown"
-              style={styles.languageButton}
-            />
-          </View>
+      <View style={styles.headerContent}>
+        <View style={styles.leftSection}>
+          <MenuButton />
+          <HeaderButton
+            icon="globe-outline"
+            text="Go To Website"
+            variant="primary"
+          />
         </View>
-      </ScrollView>
+
+        <View style={styles.middleSection}>
+          <HeaderButton
+            icon="chatbubble-outline"
+            text="Chat With Us"
+          />
+          <HeaderButton
+            icon="business-outline"
+            text="HealthEase"
+            showDropdown
+          />
+        </View>
+
+        <View style={styles.rightSection}>
+          <HeaderButton
+            icon="person-circle-outline"
+            text="Mr Patient"
+            showDropdown
+          />
+          <HeaderButton
+            icon="flag-outline"
+            text="EN"
+            showDropdown
+          />
+        </View>
+      </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   headerContainer: {
-    backgroundColor: '#ffffff',
+    backgroundColor: '#FFFFFF',
     borderBottomWidth: 1,
     borderBottomColor: '#E5E9EB',
     shadowColor: '#000',
@@ -167,28 +141,39 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 5,
+    width: '100%',
   },
-  headerScroll: {
-    flexGrow: 0,
-  },
-  header: {
+  headerContent: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
     paddingVertical: 12,
-    paddingHorizontal: 24,
-    minWidth: '100%',
+    gap: 16,
   },
   leftSection: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginRight: 48,
-    gap: 24, // Increased gap between menu and website button
+    gap: 16,
+  },
+  middleSection: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    flex: 1,
+    justifyContent: 'center',
   },
   rightSection: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 24, // Increased gap between buttons
+    gap: 8,
+  },
+  menuButton: {
+    backgroundColor: '#00695C',
+    padding: 8,
+    borderRadius: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   button: {
     flexDirection: 'row',
@@ -196,31 +181,39 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     paddingHorizontal: 12,
     borderRadius: 8,
+    gap: 6,
+  },
+  primaryButton: {
+    backgroundColor: '#00695C',
+  },
+  secondaryButton: {
+    backgroundColor: '#E0F2F1',
+  },
+  primaryButtonHovered: {
+    backgroundColor: '#004D40',
+  },
+  secondaryButtonHovered: {
+    backgroundColor: '#B2DFDB',
+  },
+  buttonPressed: {
+    opacity: 0.8,
+    transform: [{ scale: 0.98 }],
+  },
+  buttonIcon: {
+    marginRight: 4,
   },
   buttonText: {
-    fontWeight: '600',
-    marginLeft: 8,
-    marginRight: 4,
     fontSize: 14,
+    fontWeight: '600',
   },
-  menuButton: {
-    padding: 10,
+  primaryButtonText: {
+    color: '#FFFFFF',
   },
-  websiteButton: {
-    paddingVertical: 8,
-    paddingHorizontal: 12,
+  secondaryButtonText: {
+    color: '#00695C',
   },
-  actionButton: {
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-  },
-  dropdownButton: {
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-  },
-  languageButton: {
-    paddingVertical: 8,
-    paddingHorizontal: 12,
+  dropdownIcon: {
+    marginLeft: 2,
   },
 });
 

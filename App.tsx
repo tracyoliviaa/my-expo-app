@@ -1,4 +1,3 @@
-// App.tsx
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createDrawerNavigator } from '@react-navigation/drawer';
@@ -38,7 +37,7 @@ export default function App() {
       <NavigationContainer>
         <Drawer.Navigator
           initialRouteName="Dashboard"
-          drawerContent={(props) => <CustomerDrawerContent {...props} />}
+          drawerContent={props => <CustomerDrawerContent {...props} />}
           screenOptions={{
             header: () => <Header />,
             drawerStyle: {

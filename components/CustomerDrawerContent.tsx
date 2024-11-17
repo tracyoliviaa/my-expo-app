@@ -1,236 +1,261 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, Pressable } from 'react-native';
+import React, { useState, useEffect, useRef } from 'react';
+import { View, Text, StyleSheet, Animated, TouchableOpacity, Image, Pressable } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { useNavigation, DrawerActions } from '@react-navigation/native';
-import { DrawerNavigationProp } from '@react-navigation/drawer';
+import { DrawerContentScrollView, DrawerContentComponentProps } from '@react-navigation/drawer';
 
-type RootDrawerParamList = {
-  Dashboard: undefined;
-  Device: undefined;
-  Doctor: undefined;
-  Patient: undefined;
-  'Doctor Schedule': undefined;
-  'Patient Appointment': undefined;
-  'Patient Case Studies': undefined;
-  Prescription: undefined;
-  'Login Page': undefined;
-};
+interface MenuItem {
+  name: string;
+  icon: keyof typeof Ionicons.glyphMap;
+  route: string;
+}
 
-const Header = () => {
-  const navigation = useNavigation<DrawerNavigationProp<RootDrawerParamList>>();
-  const [hoveredButton, setHoveredButton] = useState<string | null>(null);
+const menuItems: MenuItem[] = [
+  { name: 'Dashboard', icon: 'speedometer-outline', route: 'Dashboard' },
+  { name: 'Device', icon: 'hardware-chip-outline', route: 'Device' },
+  { name: 'Doctor', icon: 'medkit-outline', route: 'Doctor' },
+  { name: 'Patient', icon: 'people-outline', route: 'Patient' },
+  { name: 'Doctor Schedule', icon: 'calendar-outline', route: 'Doctor Schedule' },
+  { name: 'Patient Appointment', icon: 'calendar-number-outline', route: 'Patient Appointment' },
+  { name: 'Patient Case Studies', icon: 'document-text-outline', route: 'Patient Case Studies' },
+  { name: 'Prescription', icon: 'medical-outline', route: 'Prescription' },
+  { name: 'Login Page', icon: 'log-in-outline', route: 'Login Page' }
+];
 
-  const CustomButton = ({
-    icon,
-    text,
-    style,
-    variant = 'default',
-    onPress,
-    identifier,
-  }: {
-    icon: string;
-    text?: string;
-    style?: any;
-    variant?: 'primary' | 'secondary' | 'default';
-    onPress?: () => void;
-    identifier: string;
-  }) => {
-    const getColors = () => {
-      switch (variant) {
-        case 'primary':
-          return {
-            default: { bg: '#00695C', text: '#ffffff', icon: '#ffffff' },
-            pressed: { bg: '#004D40', text: '#ffffff', icon: '#ffffff' },
-            hovered: { bg: '#004D40', text: '#ffffff', icon: '#ffffff' },
-          };
-        case 'secondary':
-          return {
-            default: { bg: '#E0F2F1', text: '#00695C', icon: '#00695C' },
-            pressed: { bg: '#B2DFDB', text: '#00695C', icon: '#00695C' },
-            hovered: { bg: '#B2DFDB', text: '#00695C', icon: '#00695C' },
-          };
-        default:
-          return {
-            default: { bg: '#E0F2F1', text: '#00695C', icon: '#00695C' },
-            pressed: { bg: '#B2DFDB', text: '#00695C', icon: '#00695C' },
-            hovered: { bg: '#B2DFDB', text: '#00695C', icon: '#00695C' },
-          };
-      }
-    };
+export default function CustomDrawerContent(props: DrawerContentComponentProps) {
+  const [isExpanded, setIsExpanded] = useState(true);
+  const [logoutHovered, setLogoutHovered] = useState(false);
+  const drawerWidth = useRef(new Animated.Value(280)).current;
 
-    const colors = getColors();
-    const isHovered = hoveredButton === identifier;
+  const toggleDrawer = () => {
+    const toValue = isExpanded ? 80 : 280;
+    Animated.timing(drawerWidth, {
+      toValue,
+      duration: 300,
+      useNativeDriver: false,
+    }).start();
+    setIsExpanded(!isExpanded);
+  };
+
+  const MenuItemComponent = ({ item }: { item: MenuItem }) => {
+    const [hovered, setHovered] = useState(false);
+    const backgroundColor = useRef(new Animated.Value(0)).current;
+
+    useEffect(() => {
+      Animated.timing(backgroundColor, {
+        toValue: hovered ? 1 : 0,
+        duration: 300,
+        useNativeDriver: false,
+      }).start();
+    }, [hovered]);
+
+    const bgColorInterpolation = backgroundColor.interpolate({
+      inputRange: [0, 1],
+      outputRange: ['transparent', '#00695C']  // Zurück zum grünen Hover-Effekt
+    });
 
     return (
       <Pressable
-        onPress={onPress}
-        onHoverIn={() => setHoveredButton(identifier)}
-        onHoverOut={() => setHoveredButton(null)}
-        style={({ pressed }) => [
-          styles.button,
-          style,
-          { backgroundColor: isHovered ? colors.hovered.bg : colors.default.bg },
-          pressed && { backgroundColor: colors.pressed.bg, transform: [{ scale: 0.98 }] },
-        ]}
+        onPress={() => props.navigation.navigate(item.route)}
+        onHoverIn={() => setHovered(true)}
+        onHoverOut={() => setHovered(false)}
       >
-        <Ionicons
-          name={icon as any}
-          size={20}
-          color={isHovered ? colors.hovered.icon : colors.default.icon}
-        />
-        {text && (
-          <Text
-            style={[
-              styles.buttonText,
-              { color: isHovered ? colors.hovered.text : colors.default.text },
-            ]}
-          >
-            {text}
-          </Text>
-        )}
-        {identifier.includes('dropdown') && (
+        <Animated.View style={[
+          styles.menuItemContainer,
+          { backgroundColor: bgColorInterpolation }
+        ]}>
           <Ionicons
-            name="chevron-down"
-            size={16}
-            color={isHovered ? colors.hovered.icon : colors.default.icon}
+            name={item.icon}
+            size={24}
+            color={hovered ? '#ffffff' : '#2F4858'}  // Icon wird weiß beim Hovern
           />
-        )}
+          {isExpanded && (
+            <Text style={[
+              styles.menuText,
+              hovered && styles.menuTextHovered
+            ]}>
+              {item.name}
+            </Text>
+          )}
+        </Animated.View>
       </Pressable>
     );
   };
 
   return (
-    <View style={styles.headerContainer}>
-      <View style={styles.header}>
-        {/* Navigation Section */}
-        <CustomButton
-          icon="menu-outline"
-          variant="primary"
-          identifier="menu"
-          onPress={() => navigation.dispatch(DrawerActions.toggleDrawer())}
-          style={styles.menuButton}
-        />
-        
-        {/* Main Actions Section */}
-        <View style={styles.mainSection}>
-          <CustomButton
-            icon="globe-outline"
-            text="Go To Website"
-            variant="primary"
-            identifier="website"
-            style={styles.websiteButton}
-          />
-
-          <CustomButton
-            icon="chatbubble-outline"
-            text="Chat With Us"
-            identifier="chat"
-            style={styles.actionButton}
-          />
+    <Animated.View style={[styles.container, { width: drawerWidth }]}>
+      <DrawerContentScrollView {...props} contentContainerStyle={styles.drawerContent}>
+        {/* Header */}
+        <View style={styles.header}>
+          <View style={styles.logoContainer}>
+            <Image
+              source={require('../assets/logo.png')}
+              style={styles.logo}
+              resizeMode="contain"
+            />
+            {isExpanded && (
+              <Image
+                source={require('../assets/logo-body.png')}
+                style={styles.logoBody}
+                resizeMode="contain"
+              />
+            )}
+          </View>
+          <TouchableOpacity onPress={toggleDrawer} style={styles.toggleButton}>
+            <Ionicons
+              name={isExpanded ? 'chevron-back-outline' : 'chevron-forward-outline'}
+              size={24}
+              color="#2F4858"
+            />
+          </TouchableOpacity>
         </View>
 
-        {/* Company Section */}
-        <View style={styles.companySection}>
-          <CustomButton
-            icon="business-outline"
-            text="HealthEase"
-            identifier="business-dropdown"
-            style={styles.dropdownButton}
+        {/* Profile Section */}
+        <View style={styles.profileSection}>
+          <Image
+            source={require('../assets/profile.png')}
+            style={styles.profileImage}
           />
+          {isExpanded && (
+            <View style={styles.profileInfo}>
+              <Text style={styles.profileName}>Super Admin</Text>
+              <Text style={styles.profileRole}>Administrator</Text>
+            </View>
+          )}
         </View>
 
-        {/* User Section */}
-        <View style={styles.userSection}>
-          <CustomButton
-            icon="person-circle-outline"
-            text="Mr Patient"
-            identifier="user-dropdown"
-            style={styles.dropdownButton}
-          />
-
-          <CustomButton
-            icon="flag-outline"
-            text="EN"
-            identifier="language-dropdown"
-            style={styles.languageButton}
-          />
+        {/* Menu Items */}
+        <View style={styles.menuContainer}>
+          {menuItems.map((item) => (
+            <MenuItemComponent key={item.name} item={item} />
+          ))}
         </View>
-      </View>
-    </View>
+
+        {/* Logout */}
+        <Pressable
+          onPress={() => props.navigation.navigate('Login')}
+          onHoverIn={() => setLogoutHovered(true)}
+          onHoverOut={() => setLogoutHovered(false)}
+          style={[
+            styles.logoutButton,
+            logoutHovered && styles.logoutButtonHovered
+          ]}
+        >
+          <View style={styles.logoutContent}>
+            <Ionicons name="log-out-outline" size={24} color="#FF4B4B" />
+            {isExpanded && <Text style={styles.logoutText}>Logout</Text>}
+          </View>
+          <Ionicons 
+            name="chevron-forward-outline" 
+            size={20} 
+            color="#000000" 
+            style={styles.logoutArrow}
+          />
+        </Pressable>
+      </DrawerContentScrollView>
+    </Animated.View>
   );
-};
+}
 
 const styles = StyleSheet.create({
-  headerContainer: {
+  container: {
+    flex: 1,
     backgroundColor: '#ffffff',
-    borderBottomWidth: 1,
-    borderBottomColor: '#E5E9EB',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 5,
-    width: '100%',
+  },
+  drawerContent: {
+    flex: 1,
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 12,
-    paddingHorizontal: 24,
-    gap: 24,
-    width: '100%',
+    justifyContent: 'space-between',
+    padding: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#E5E9EB',
+    height: 80,
   },
-  mainSection: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 24,
-    flex: 1,
-    marginLeft: 24,
-  },
-  companySection: {
+  logoContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     flex: 1,
-    justifyContent: 'center',
+    gap: 8,
   },
-  userSection: {
+  logo: {
+    width: 40,
+    height: 40,
+  },
+  logoBody: {
+    height: 30,
+    width: 120,
+  },
+  toggleButton: {
+    padding: 4,
+  },
+  profileSection: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 16,
+    padding: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#E5E9EB',
+  },
+  profileImage: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    marginRight: 12,
+  },
+  profileInfo: {
+    flex: 1,
+  },
+  profileName: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#2F4858',
+  },
+  profileRole: {
+    fontSize: 14,
+    color: '#6B7280',
+  },
+  menuContainer: {
+    flex: 1,
+    paddingTop: 8,
+    paddingHorizontal: 12,
+  },
+  menuItemContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 12,
+    borderRadius: 8,
+    marginBottom: 4,
+  },
+  menuText: {
+    fontSize: 16,
+    marginLeft: 12,
+    color: '#2F4858',
+  },
+  menuTextHovered: {
+    color: '#ffffff',  // Text wird weiß beim Hovern
+  },
+  logoutButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: 16,
+    borderTopWidth: 1,
+    borderTopColor: '#E5E9EB',
+  },
+  logoutButtonHovered: {
+    backgroundColor: '#FFF1F1',  // Leicht rötlicher Hover-Effekt
+  },
+  logoutContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  logoutText: {
+    fontSize: 16,
+    marginLeft: 12,
+    color: '#000000',  // Schwarzer Text wie im Original
+  },
+  logoutArrow: {
     marginLeft: 'auto',
   },
-  button: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    borderRadius: 8,
-  },
-  buttonText: {
-    fontWeight: '600',
-    marginLeft: 8,
-    marginRight: 4,
-    fontSize: 14,
-  },
-  menuButton: {
-    padding: 10,
-  },
-  websiteButton: {
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-  },
-  actionButton: {
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-  },
-  dropdownButton: {
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-  },
-  languageButton: {
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-  },
 });
-
-export default Header;
