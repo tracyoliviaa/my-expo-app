@@ -1,168 +1,236 @@
-import React, { useState, useRef } from 'react';
-import { View, Text, StyleSheet, Animated, TouchableOpacity, Image, Pressable } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, ScrollView, Pressable } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { DrawerContentScrollView, DrawerContentComponentProps } from '@react-navigation/drawer';
+import { useNavigation, DrawerActions } from '@react-navigation/native';
+import { DrawerNavigationProp } from '@react-navigation/drawer';
 
-interface MenuItem {
-  name: string;
-  icon: keyof typeof Ionicons.glyphMap;
-  route: string;
-}
+type RootDrawerParamList = {
+  Dashboard: undefined;
+  Device: undefined;
+  Doctor: undefined;
+  Patient: undefined;
+  'Doctor Schedule': undefined;
+  'Patient Appointment': undefined;
+  'Patient Case Studies': undefined;
+  Prescription: undefined;
+  'Login Page': undefined;
+};
 
-const menuItems: MenuItem[] = [
-  { name: 'Dashboard', icon: 'speedometer-outline', route: 'Dashboard' },
-  { name: 'Device', icon: 'hardware-chip-outline', route: 'Device' },
-  { name: 'Doctor', icon: 'medkit-outline', route: 'Doctor' },
-  { name: 'Patient', icon: 'people-outline', route: 'Patient' },
-  { name: 'Doctor Schedule', icon: 'calendar-outline', route: 'Doctor Schedule' },
-  { name: 'Patient Appointment', icon: 'calendar-number-outline', route: 'Patient Appointment' },
-  { name: 'Patient Case Studies', icon: 'document-text-outline', route: 'Patient Case Studies' },
-  { name: 'Prescription', icon: 'medical-outline', route: 'Prescription' },
-  { name: 'Login Page', icon: 'log-in-outline', route: 'Login Page' }
-];
+const Header = () => {
+  const navigation = useNavigation<DrawerNavigationProp<RootDrawerParamList>>();
+  const [hoveredButton, setHoveredButton] = useState<string | null>(null);
 
-export default function CustomDrawerContent(props: DrawerContentComponentProps) {
-  const [isExpanded, setIsExpanded] = useState(true);
-  const drawerWidth = useRef(new Animated.Value(280)).current;
+  const CustomButton = ({
+    icon,
+    text,
+    style,
+    variant = 'default',
+    onPress,
+    identifier,
+  }: {
+    icon: string;
+    text?: string;
+    style?: any;
+    variant?: 'primary' | 'secondary' | 'default';
+    onPress?: () => void;
+    identifier: string;
+  }) => {
+    const getColors = () => {
+      switch (variant) {
+        case 'primary':
+          return {
+            default: { bg: '#00695C', text: '#ffffff', icon: '#ffffff' },
+            pressed: { bg: '#004D40', text: '#ffffff', icon: '#ffffff' },
+            hovered: { bg: '#004D40', text: '#ffffff', icon: '#ffffff' },
+          };
+        case 'secondary':
+          return {
+            default: { bg: '#E0F2F1', text: '#00695C', icon: '#00695C' },
+            pressed: { bg: '#B2DFDB', text: '#00695C', icon: '#00695C' },
+            hovered: { bg: '#B2DFDB', text: '#00695C', icon: '#00695C' },
+          };
+        default:
+          return {
+            default: { bg: '#E0F2F1', text: '#00695C', icon: '#00695C' },
+            pressed: { bg: '#B2DFDB', text: '#00695C', icon: '#00695C' },
+            hovered: { bg: '#B2DFDB', text: '#00695C', icon: '#00695C' },
+          };
+      }
+    };
 
-  const toggleDrawer = () => {
-    const toValue = isExpanded ? 80 : 280;
-    Animated.timing(drawerWidth, {
-      toValue,
-      duration: 300,
-      useNativeDriver: false,
-    }).start();
-    setIsExpanded(!isExpanded);
-  };
+    const colors = getColors();
+    const isHovered = hoveredButton === identifier;
 
-  const MenuItemComponent = ({ item }: { item: MenuItem }) => {
     return (
       <Pressable
-        onPress={() => props.navigation.navigate(item.route)}
-        style={styles.menuItemContainer}
+        onPress={onPress}
+        onHoverIn={() => setHoveredButton(identifier)}
+        onHoverOut={() => setHoveredButton(null)}
+        style={({ pressed }) => [
+          styles.button,
+          style,
+          { backgroundColor: isHovered ? colors.hovered.bg : colors.default.bg },
+          pressed && { backgroundColor: colors.pressed.bg, transform: [{ scale: 0.98 }] },
+        ]}
       >
         <Ionicons
-          name={item.icon}
-          size={24}
-          color="#2F4858"
+          name={icon as any}
+          size={20}
+          color={isHovered ? colors.hovered.icon : colors.default.icon}
         />
-        {isExpanded && (
-          <Text style={styles.menuText}>
-            {item.name}
+        {text && (
+          <Text
+            style={[
+              styles.buttonText,
+              { color: isHovered ? colors.hovered.text : colors.default.text },
+            ]}
+          >
+            {text}
           </Text>
+        )}
+        {identifier.includes('dropdown') && (
+          <Ionicons
+            name="chevron-down"
+            size={16}
+            color={isHovered ? colors.hovered.icon : colors.default.icon}
+          />
         )}
       </Pressable>
     );
   };
 
   return (
-    <Animated.View style={[styles.container, { width: drawerWidth }]}>
-      <DrawerContentScrollView {...props} contentContainerStyle={styles.drawerContent}>
-        {/* Header */}
-        <View style={styles.header}>
-          <View style={styles.logoContainer}>
-            <Image
-              source={require('../assets/logo.png')}
-              style={styles.logo}
-              resizeMode="contain"
-            />
-            <Image
-              source={require('../assets/logo-body.png')}
-              style={styles.logoBody}
-              resizeMode="contain"
-            />
-          </View>
-          <TouchableOpacity onPress={toggleDrawer} style={styles.toggleButton}>
-            <Ionicons
-              name={isExpanded ? 'chevron-back-outline' : 'chevron-forward-outline'}
-              size={24}
-              color="#2F4858"
-            />
-          </TouchableOpacity>
+    <View style={styles.headerContainer}>
+      <View style={styles.header}>
+        {/* Navigation Section */}
+        <CustomButton
+          icon="menu-outline"
+          variant="primary"
+          identifier="menu"
+          onPress={() => navigation.dispatch(DrawerActions.toggleDrawer())}
+          style={styles.menuButton}
+        />
+        
+        {/* Main Actions Section */}
+        <View style={styles.mainSection}>
+          <CustomButton
+            icon="globe-outline"
+            text="Go To Website"
+            variant="primary"
+            identifier="website"
+            style={styles.websiteButton}
+          />
+
+          <CustomButton
+            icon="chatbubble-outline"
+            text="Chat With Us"
+            identifier="chat"
+            style={styles.actionButton}
+          />
         </View>
 
-        {/* Menu Items */}
-        <View style={styles.menuContainer}>
-          {menuItems.map((item) => (
-            <MenuItemComponent key={item.name} item={item} />
-          ))}
+        {/* Company Section */}
+        <View style={styles.companySection}>
+          <CustomButton
+            icon="business-outline"
+            text="HealthEase"
+            identifier="business-dropdown"
+            style={styles.dropdownButton}
+          />
         </View>
 
-        {/* Logout */}
-        <Pressable
-          onPress={() => props.navigation.navigate('Login')}
-          style={styles.logoutButton}
-        >
-          <Ionicons name="log-out-outline" size={24} color="#FF4B4B" />
-          {isExpanded && <Text style={styles.logoutText}>Log Out</Text>}
-        </Pressable>
-      </DrawerContentScrollView>
-    </Animated.View>
+        {/* User Section */}
+        <View style={styles.userSection}>
+          <CustomButton
+            icon="person-circle-outline"
+            text="Mr Patient"
+            identifier="user-dropdown"
+            style={styles.dropdownButton}
+          />
+
+          <CustomButton
+            icon="flag-outline"
+            text="EN"
+            identifier="language-dropdown"
+            style={styles.languageButton}
+          />
+        </View>
+      </View>
+    </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
+  headerContainer: {
     backgroundColor: '#ffffff',
-  },
-  drawerContent: {
-    flex: 1,
+    borderBottomWidth: 1,
+    borderBottomColor: '#E5E9EB',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 5,
+    width: '100%',
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
-    padding: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#E5E9EB',
-    height: 80,
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    gap: 24,
+    width: '100%',
   },
-  logoContainer: {
+  mainSection: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 24,
+    flex: 1,
+    marginLeft: 24,
+  },
+  companySection: {
     flexDirection: 'row',
     alignItems: 'center',
     flex: 1,
+    justifyContent: 'center',
   },
-  logo: {
-    width: 40,
-    height: 40,
+  userSection: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 16,
+    marginLeft: 'auto',
   },
-  logoBody: {
-    height: 20,
+  button: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 8,
+  },
+  buttonText: {
+    fontWeight: '600',
     marginLeft: 8,
-    flex: 1,
+    marginRight: 4,
+    fontSize: 14,
   },
-  toggleButton: {
-    padding: 4,
+  menuButton: {
+    padding: 10,
   },
-  menuContainer: {
-    flex: 1,
-    paddingTop: 8,
+  websiteButton: {
+    paddingVertical: 8,
     paddingHorizontal: 12,
   },
-  menuItemContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 12,
-    borderRadius: 8,
-    marginBottom: 4,
+  actionButton: {
+    paddingVertical: 8,
+    paddingHorizontal: 12,
   },
-  menuText: {
-    fontSize: 16,
-    marginLeft: 12,
-    color: '#2F4858',
-    flex: 1,
+  dropdownButton: {
+    paddingVertical: 8,
+    paddingHorizontal: 12,
   },
-  logoutButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 16,
-    borderTopWidth: 1,
-    borderTopColor: '#E5E9EB',
-  },
-  logoutText: {
-    fontSize: 16,
-    marginLeft: 12,
-    color: '#FF4B4B',
+  languageButton: {
+    paddingVertical: 8,
+    paddingHorizontal: 12,
   },
 });
+
+export default Header;
