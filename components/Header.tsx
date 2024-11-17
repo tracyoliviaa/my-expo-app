@@ -20,88 +20,140 @@ export default function Header() {
   const navigation = useNavigation<DrawerNavigationProp<RootDrawerParamList>>();
 
   return (
-    <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.headerScroll}>
-      <View style={styles.header}>
-        <View style={styles.leftSection}>
-          <TouchableOpacity onPress={() => navigation.dispatch(DrawerActions.toggleDrawer())} style={styles.menuButton}>
-            <Ionicons name="menu-outline" size={24} color="#2F4858" />
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.headerButton} onPress={() => {/* Navigate to main page */}}>
-            <Ionicons name="globe-outline" size={20} color="#2F4858" />
-            <Text style={styles.buttonText}>Go To Website</Text>
-          </TouchableOpacity>
+    <View style={styles.headerContainer}>
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.headerScroll}>
+        <View style={styles.header}>
+          <View style={styles.leftSection}>
+            <TouchableOpacity onPress={() => navigation.dispatch(DrawerActions.toggleDrawer())} style={styles.menuButton}>
+              <Ionicons name="menu-outline" size={24} color="#ffffff" />
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.websiteButton} onPress={() => {/* Navigate to main page */}}>
+              <Ionicons name="globe-outline" size={20} color="#ffffff" />
+              <Text style={styles.websiteButtonText}>Go To Website</Text>
+            </TouchableOpacity>
+          </View>
+          <View style={styles.rightSection}>
+            <TouchableOpacity style={styles.actionButton}>
+              <Ionicons name="chatbubble-outline" size={20} color="#00695C" />
+              <Text style={styles.actionButtonText}>Chat With Us</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.dropdownButton}>
+              <Ionicons name="business-outline" size={20} color="#00695C" />
+              <Text style={styles.dropdownButtonText}>HealthEase</Text>
+              <Ionicons name="chevron-down" size={16} color="#00695C" />
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.dropdownButton}>
+              <Ionicons name="person-circle-outline" size={20} color="#00695C" />
+              <Text style={styles.dropdownButtonText}>Mr Patient</Text>
+              <Ionicons name="chevron-down" size={16} color="#00695C" />
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.languageButton}>
+              <Ionicons name="flag-outline" size={20} color="#00695C" />
+              <Text style={styles.languageButtonText}>EN</Text>
+              <Ionicons name="chevron-down" size={16} color="#00695C" />
+            </TouchableOpacity>
+          </View>
         </View>
-        <View style={styles.rightSection}>
-          <TouchableOpacity style={styles.headerButton}>
-            <Ionicons name="chatbubble-outline" size={20} color="#2F4858" />
-            <Text style={styles.buttonText}>Chat With Us</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.headerButton}>
-            <Ionicons name="business-outline" size={20} color="#2F4858" />
-            <Text style={styles.buttonText}>HealthEase</Text>
-            <Ionicons name="chevron-down" size={16} color="#2F4858" />
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.headerButton}>
-            <Ionicons name="person-circle-outline" size={20} color="#2F4858" />
-            <Text style={styles.buttonText}>Mr Patient</Text>
-            <Ionicons name="chevron-down" size={16} color="#2F4858" />
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.languageButton}>
-            <Ionicons name="flag-outline" size={20} color="#2F4858" />
-            <Text style={styles.buttonText}>EN</Text>
-            <Ionicons name="chevron-down" size={16} color="#2F4858" />
-          </TouchableOpacity>
-        </View>
-      </View>
-    </ScrollView>
+      </ScrollView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  headerScroll: {
-    flexDirection: 'row',
-    overflow: 'scroll',
-    backgroundColor: '#fff',
+  headerContainer: {
+    backgroundColor: '#ffffff',
     borderBottomWidth: 1,
     borderBottomColor: '#E5E9EB',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  headerScroll: {
+    flexGrow: 0,
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: 12,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
     minWidth: '100%',
   },
   leftSection: {
     flexDirection: 'row',
     alignItems: 'center',
-  },
-  menuButton: {
-    marginRight: 16,
-    padding: 4,
+    marginRight: 24,
   },
   rightSection: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
   },
-  headerButton: {
+  menuButton: {
+    padding: 10,
+    borderRadius: 8,
+    backgroundColor: '#00695C',
+    marginRight: 12,
+  },
+  websiteButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
-    padding: 8,
-    marginHorizontal: 4,
+    backgroundColor: '#00695C',
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 8,
   },
-  buttonText: {
+  websiteButtonText: {
+    color: '#ffffff',
+    fontWeight: '600',
+    marginLeft: 8,
     fontSize: 14,
-    color: '#2F4858',
-    fontWeight: '500',
+  },
+  actionButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#E0F2F1',
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 8,
+    marginRight: 12,
+  },
+  actionButtonText: {
+    color: '#00695C',
+    fontWeight: '600',
+    marginLeft: 8,
+    fontSize: 14,
+  },
+  dropdownButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#E0F2F1',
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 8,
+    marginRight: 12,
+  },
+  dropdownButtonText: {
+    color: '#00695C',
+    fontWeight: '600',
+    marginLeft: 8,
+    marginRight: 4,
+    fontSize: 14,
   },
   languageButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 4,
-    padding: 6,
-    marginLeft: 4,
+    backgroundColor: '#E0F2F1',
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 8,
+  },
+  languageButtonText: {
+    color: '#00695C',
+    fontWeight: '600',
+    marginLeft: 8,
+    marginRight: 4,
+    fontSize: 14,
   },
 });
