@@ -16,23 +16,44 @@ type RootDrawerParamList = {
   'Login Page': undefined;
 };
 
+/*************  ✨ Codeium Command 🌟  *************/
+/**
+ * The Header component is a functional component that renders the header of the app.
+ * It uses the Ionicons library to render icons and the useNavigation hook from
+ * react-navigation to navigate to different screens.
+ */
 export default function Header() {
+  /**
+   * Get the navigation object from the useNavigation hook.
+   */
   const navigation = useNavigation<DrawerNavigationProp<RootDrawerParamList>>();
 
+  /**
+   * Render the header component.
+   */
   return (
     <View style={styles.headerContainer}>
       <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.headerScroll}>
         <View style={styles.header}>
           <View style={styles.leftSection}>
+            /**
+             * Render a button that toggles the drawer when pressed.
+             */
             <TouchableOpacity onPress={() => navigation.dispatch(DrawerActions.toggleDrawer())} style={styles.menuButton}>
               <Ionicons name="menu-outline" size={24} color="#ffffff" />
             </TouchableOpacity>
+            /**
+             * Render a button that navigates to the main page when pressed.
+             */
             <TouchableOpacity style={styles.websiteButton} onPress={() => {/* Navigate to main page */}}>
               <Ionicons name="globe-outline" size={20} color="#ffffff" />
               <Text style={styles.websiteButtonText}>Go To Website</Text>
             </TouchableOpacity>
           </View>
           <View style={styles.rightSection}>
+            /**
+             * Render a button that navigates to the chat screen when pressed.
+             */
             <TouchableOpacity style={styles.actionButton}>
               <Ionicons name="chatbubble-outline" size={20} color="#00695C" />
               <Text style={styles.actionButtonText}>Chat With Us</Text>
@@ -75,6 +96,7 @@ const styles = StyleSheet.create({
   },
   header: {
     flexDirection: 'row',
+/******  607f039f-0d04-483a-8285-607342792e79  *******/
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingVertical: 12,
